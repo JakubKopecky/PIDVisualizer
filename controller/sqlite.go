@@ -26,7 +26,9 @@ func NewDbController(file string) *Sqlite {
 func cleanDB(db *sql.DB) {
 	for _, item := range getTables(db) {
 		dropTableByName(db, item)
+
 	}
+	initTables(db)
 }
 
 func getTables(db *sql.DB) []string {
@@ -60,6 +62,13 @@ func dropTableByName(db *sql.DB, name string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initTables(db *sql.DB) {
+	log.Print("Creating table: TBLTRIPS")
+	db.Exec("CREATE TABLE `TBLTRIPS` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, PRIMARY KEY (`ID`));")
+	log.Print("Creating table: TBLTRIPUPDATES")
+	db.Exec("CREATE TABLE `TBLTRIPUPDATES` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, `DATA` TEXT NOT NULL, PRIMARY KEY (`ID`));")
 }
 
 func (sqlite *Sqlite) Exec(sql string) (sql.Result, error) {
