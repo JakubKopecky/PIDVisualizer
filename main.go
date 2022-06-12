@@ -3,12 +3,10 @@ package main
 import (
 	"database/sql"
 	"log"
-
-	_ "modernc.org/sqlite"
 )
 
 func main() {
-	//callApi()
+	callApi()
 
 	db, err := sql.Open("sqlite", "./names.db")
 	checkErr(err)
