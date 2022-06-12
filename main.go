@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	callApi()
+	//callApi()
 
 	sqlite := controller.NewDbController("./pid.db")
 	sqlite.Exec("create table memos(text, priority INTEGER);")

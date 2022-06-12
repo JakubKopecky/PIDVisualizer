@@ -36,7 +36,6 @@ func cleanDB(db *sql.DB) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Print("Droping table: " + name)
 		dropTableByName(db, name)
 	}
 
@@ -47,6 +46,8 @@ func cleanDB(db *sql.DB) {
 }
 
 func dropTableByName(db *sql.DB, name string) {
+	log.Print("Droping table: " + name)
+
 	sql := fmt.Sprintf("DROP TABLE %s;", name)
 	_, err := db.Exec(sql)
 	if err != nil {
@@ -55,6 +56,7 @@ func dropTableByName(db *sql.DB, name string) {
 }
 
 func (sqlite *Sqlite) Exec(sql string) (sql.Result, error) {
+	log.Print("Executing: " + sql)
 	return sqlite.db.Exec(sql)
 }
 
