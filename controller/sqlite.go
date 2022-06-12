@@ -24,25 +24,32 @@ func NewDbController(file string) *Sqlite {
 }
 
 func cleanDB(db *sql.DB) {
+	for _, item := range getTables(db) {
+		dropTableByName(db, item)
+	}
+}
+
+func getTables(db *sql.DB) []string {
 	rows, err := db.Query("SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
+	var tables []string
 	var name string
 	for rows.Next() {
 		err := rows.Scan(&name)
 		if err != nil {
 			log.Fatal(err)
 		}
-		dropTableByName(db, name)
+		tables = append(tables, name)
 	}
 
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
 	}
+	return tables
 }
 
 func dropTableByName(db *sql.DB, name string) {
