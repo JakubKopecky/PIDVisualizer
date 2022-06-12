@@ -1,21 +1,18 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/JakubKopecky/PIDVisualizer/controller"
 )
 
 func main() {
 	callApi()
 
-	db, err := sql.Open("sqlite3", "./pid.db")
-	db.Exec("create table memos(text, priority INTEGER);")
-	db.Exec("insert into memos values('deliver project description', 10);")
-	db.Exec("insert into memos values('lunch with Christine', 100);")
-	checkErr(err)
-	defer db.Close()
+	sqlite := controller.NewDbController("./pid.db")
+	sqlite.Exec("create table memos(text, priority INTEGER);")
+	sqlite.Exec("insert into memos values('deliver project description', 10);")
+	sqlite.Exec("insert into memos values('lunch with Christine', 100);")
 }
 
 func checkErr(err error) {
