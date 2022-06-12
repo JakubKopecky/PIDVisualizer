@@ -66,9 +66,18 @@ func dropTableByName(db *sql.DB, name string) {
 
 func initTables(db *sql.DB) {
 	log.Print("Creating table: TBLTRIPS")
-	db.Exec("CREATE TABLE `TBLTRIPS` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, PRIMARY KEY (`ID`));")
+	result, err := db.Exec("CREATE TABLE `TBLTRIPS` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, PRIMARY KEY (`ID`));")
+	log.Print(result.RowsAffected())
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	log.Print("Creating table: TBLTRIPUPDATES")
 	db.Exec("CREATE TABLE `TBLTRIPUPDATES` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, `DATA` TEXT NOT NULL, PRIMARY KEY (`ID`));")
+	log.Print(result.RowsAffected())
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (sqlite *Sqlite) Exec(sql string) (sql.Result, error) {
