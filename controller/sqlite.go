@@ -2,6 +2,7 @@ package controller
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -35,10 +36,19 @@ func cleanDB(db *sql.DB) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Print(name)
+		log.Print("Droping table: " + name)
+		dropTableByName(db, name)
 	}
 
 	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func dropTableByName(db *sql.DB, name string) {
+	sql := fmt.Sprintf("DROP TABLE %s;", name)
+	_, err := db.Exec(sql)
 	if err != nil {
 		log.Fatal(err)
 	}
