@@ -57,3 +57,7 @@ func dropTableByName(db *sql.DB, name string) {
 func (sqlite *Sqlite) Exec(sql string) (sql.Result, error) {
 	return sqlite.db.Exec(sql)
 }
+
+func (sqlite *Sqlite) Close() {
+	sqlite.db.Close()
+}
