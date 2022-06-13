@@ -10,7 +10,21 @@ import (
 
 var getTablesSql = "SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';"
 
-func CleanDB(db *sqlx.DB) {
+func ShowTBLTRIPS(sqlite *Sqlite) {
+	table := sqlite.GetTBLTRIPS("")
+	for _, item := range table {
+		log.Printf("item: %v\n", item)
+	}
+}
+
+func ShowTBLTRIPUPDATES(sqlite *Sqlite) {
+	table := sqlite.GetTBLTRIPUPDATES("")
+	for _, item := range table {
+		log.Printf("item: %v\n", item)
+	}
+}
+
+func cleanDB(db *sqlx.DB) {
 	tables := getTables(db)
 	if tables != nil {
 		log.Print("Found old tables, cleaning...")

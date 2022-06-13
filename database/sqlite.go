@@ -1,11 +1,10 @@
-package controller
+package database
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
 
-	"github.com/JakubKopecky/PIDVisualizer/database"
 	"github.com/JakubKopecky/PIDVisualizer/model"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
@@ -21,7 +20,7 @@ func NewDbController(file string) *Sqlite {
 	if err != nil {
 		log.Fatal(err)
 	}
-	database.CleanDB(db)
+	cleanDB(db)
 
 	return &Sqlite{db: db}
 }

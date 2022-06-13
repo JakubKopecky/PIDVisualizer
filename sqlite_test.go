@@ -6,16 +6,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/JakubKopecky/PIDVisualizer/controller"
+	"github.com/JakubKopecky/PIDVisualizer/database"
 	"github.com/JakubKopecky/PIDVisualizer/model"
 )
 
-var sqlite *controller.Sqlite
+var sqlite *database.Sqlite
 
 func TestMain(m *testing.M) {
 	log.SetOutput(ioutil.Discard)
 	log.SetFlags(0)
-	sqlite = controller.NewDbController("./pid.db")
+	sqlite = database.NewDbController("./pid.db")
 	os.Exit(m.Run())
 }
 

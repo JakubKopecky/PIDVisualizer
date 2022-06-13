@@ -1,7 +1,7 @@
 package main
 
-import "github.com/JakubKopecky/PIDVisualizer/controller"
+import "github.com/JakubKopecky/PIDVisualizer/api"
 
 func main() {
-	controller.CallApi()
+	api.CallApi()
 }
