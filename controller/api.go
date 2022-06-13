@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 
 var url string = "https://api.golemio.cz/v2/vehiclepositions?routeShortName=19"
 
-func callApi() {
+func CallApi() {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)

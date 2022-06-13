@@ -5,82 +5,85 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/JakubKopecky/PIDVisualizer/database"
+	"github.com/JakubKopecky/PIDVisualizer/model"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Sqlite struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
 func NewDbController(file string) *Sqlite {
-	db, err := sql.Open("sqlite3", file)
+	log.Print("Opening db file: " + file)
+	db, err := sqlx.Open("sqlite3", file)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	cleanDB(db)
+	database.CleanDB(db)
 
 	return &Sqlite{db: db}
-}
-
-func cleanDB(db *sql.DB) {
-	for _, item := range getTables(db) {
-		dropTableByName(db, item)
-
-	}
-	initTables(db)
-}
-
-func getTables(db *sql.DB) []string {
-	rows, err := db.Query("SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	var tables []string
-	var name string
-	for rows.Next() {
-		err := rows.Scan(&name)
-		if err != nil {
-			log.Fatal(err)
-		}
-		tables = append(tables, name)
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return tables
-}
-
-func dropTableByName(db *sql.DB, name string) {
-	log.Print("Droping table: " + name)
-
-	sql := fmt.Sprintf("DROP TABLE %s;", name)
-	_, err := db.Exec(sql)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func initTables(db *sql.DB) {
-	log.Print("Creating table: TBLTRIPS")
-	_, err := db.Exec("CREATE TABLE `TBLTRIPS` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, PRIMARY KEY (`ID`));")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Print("Creating table: TBLTRIPUPDATES")
-	_, err = db.Exec("CREATE TABLE `TBLTRIPUPDATES` (`ID` INT NOT NULL AUTO_INCREMENT, `TRIP_ID` TEXT NOT NULL, `DATA` TEXT NOT NULL, PRIMARY KEY (`ID`));")
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func (sqlite *Sqlite) Exec(sql string) (sql.Result, error) {
 	log.Print("Executing: " + sql)
 	return sqlite.db.Exec(sql)
+}
+
+func (sqlite *Sqlite) Query(sql string) (*sqlx.Rows, error) {
+	log.Print("Executing: " + sql)
+	return sqlite.db.Queryx(sql)
+}
+
+func (sqlite *Sqlite) GetTBLTRIPS(where string) []model.TBLTRIPSStruct {
+	rows, err := sqlite.Query(fmt.Sprintf("SELECT * FROM TBLTRIPS %s;", where))
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	var toReturn []model.TBLTRIPSStruct
+	var line model.TBLTRIPSStruct
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.StructScan(&line)
+		if err != nil {
+			log.Panic(err)
+		}
+		toReturn = append(toReturn, line)
+	}
+	return toReturn
+}
+
+func (sqlite *Sqlite) GetTBLTRIPUPDATES(where string) []model.TBLTRIPUPDATESStruct {
+	rows, err := sqlite.Query(fmt.Sprintf("SELECT * FROM TBLTRIPUPDATES %s;", where))
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	var toReturn []model.TBLTRIPUPDATESStruct
+	var line model.TBLTRIPUPDATESStruct
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.StructScan(&line)
+		if err != nil {
+			log.Panic(err)
+		}
+		toReturn = append(toReturn, line)
+	}
+	return toReturn
+}
+
+func (sqlite *Sqlite) InsertIntoTBLTRIPS(data model.TBLTRIPSStruct) error {
+	var query = "INSERT INTO TBLTRIPS VALUES (null, :trip_id);"
+	_, err := sqlite.db.NamedExec(query, data)
+	return err
+}
+
+func (sqlite *Sqlite) InsertIntoTBLTRIPUPDATES(data model.TBLTRIPUPDATESStruct) error {
+	var query = "INSERT INTO TBLTRIPUPDATES VALUES (null, :trip_id, :data);"
+	_, err := sqlite.db.NamedExec(query, data)
+	return err
 }
 
 func (sqlite *Sqlite) Close() {
